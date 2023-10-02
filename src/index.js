@@ -1,12 +1,10 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize } = require('sequelize');
+const { Review } = require('./db/models');
+const { Translation } = require('./db/models');
 require('dotenv').config();
 
-
-connection_string = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
+const connection_string = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
 const sequelize = new Sequelize(connection_string);
-
-const Hit = require('./db/models/hit')(sequelize, DataTypes);
-
 
 (async () => {
   try {
@@ -16,11 +14,14 @@ const Hit = require('./db/models/hit')(sequelize, DataTypes);
     console.error('Unable to connect to the database:', error);
   }
 
-  const hit = new Hit({
-    text: 'ola mundo',
-    hits: 3
-  });
-  await hit.save();
-  console.log(hit);
+  const translation = await Translation.create({ text: 'ola', translation: 'OLA', requester: 'alguem' });
+  const review = await Review.create({ translationId: translation.id, rating: true, review: 'gostei', requester: 'alguem' });
+
+  const translations = await Translation.findAll();
+  const reviews = await Review.findAll();
+
+  console.log(translations);
+  console.log(reviews);
+
 })();
 
